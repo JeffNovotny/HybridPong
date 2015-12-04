@@ -15,7 +15,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	private int paddleY = 0;
 	private double ballStartVelocity = 600;
 	private double ballVelocity = 0;
-	private double ballAngle = Math.PI;//Math.random()*2*Math.PI;
+	private double ballAngle = Math.random()*2*Math.PI;
 	private int paddleLong = 100;
 	private int paddleShort = 15;
 	private double paddleRicochetRangeDegrees = 60;
@@ -89,6 +89,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 			ballAngle = percentageDouble(Math.toRadians(targetAngle-paddleRicochetRangeDegreesHalf), Math.toRadians(targetAngle+paddleRicochetRangeDegreesHalf), percentage);
 			velocityX = (int)(ballVelocity/fps*Math.cos(ballAngle));
 			velocityY = (int)(ballVelocity/fps*Math.sin(ballAngle));
+			ballHit();
 		}
 		//top paddle
 		else if(velocityY < 0 && ballX >= paddleX && ballX <= paddleX + paddleLong && ballY <= 0 + paddleShort && ballY >= 0){
@@ -99,6 +100,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 			ballAngle = percentageDouble(Math.toRadians(targetAngle+paddleRicochetRangeDegreesHalf), Math.toRadians(targetAngle-paddleRicochetRangeDegreesHalf), percentage);
 			velocityX = (int)(ballVelocity/fps*Math.cos(ballAngle));
 			velocityY = (int)(ballVelocity/fps*Math.sin(ballAngle));
+			ballHit();
 		}
 		// right paddle
 		if(velocityX > 0  && ballY >= paddleY && ballY <= paddleY + paddleLong && ballX + ballDiam >= screenWidth - paddleShort && ballX + ballDiam <= screenWidth){
@@ -109,6 +111,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 			ballAngle = percentageDouble(Math.toRadians(targetAngle+paddleRicochetRangeDegreesHalf), Math.toRadians(targetAngle-paddleRicochetRangeDegreesHalf), percentage);
 			velocityX = (int)(ballVelocity/fps*Math.cos(ballAngle));
 			velocityY = (int)(ballVelocity/fps*Math.sin(ballAngle));
+			ballHit();
 		}
 		//left paddle
 		else if(velocityX < 0 && ballY >= paddleY && ballY <= paddleY + paddleLong && ballX <= 0 + paddleShort && ballX >= 0){
@@ -119,6 +122,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 			ballAngle = percentageDouble(Math.toRadians(targetAngle-paddleRicochetRangeDegreesHalf), Math.toRadians(targetAngle+paddleRicochetRangeDegreesHalf), percentage);
 			velocityX = (int)(ballVelocity/fps*Math.cos(ballAngle));
 			velocityY = (int)(ballVelocity/fps*Math.sin(ballAngle));
+			ballHit();
 		}
 		//restart here
 		if (ballVelocity != 0 &&
@@ -126,20 +130,23 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 				    ballX > screenWidth ||
 				    ballY + ballDiam < 0 ||
 				    ballY > screenHeight)) {
-					//this means the ball went passed the screen
-			
-					velocityX = 0;
-					velocityY = 0;
-					ballVelocity = 0;
-					ballX = (screenWidth-ballDiam) / 2;
-					ballY = (screenHeight-ballDiam) / 2;
-					ballAngle = Math.PI;//Math.random()*2*Math.PI;
-				}
+			//this means the ball went passed the screen
+			velocityX = 0;
+			velocityY = 0;
+			ballVelocity = 0;
+			ballX = (screenWidth-ballDiam) / 2;
+			ballY = (screenHeight-ballDiam) / 2;
+			ballAngle = Math.random()*2*Math.PI;
+		}
 		
 		ballX += velocityX;
 		ballY += velocityY;
 		
 		repaint();
+	}
+	
+	private void ballHit() {
+		//add effects here
 	}
 	
 	private double randomDouble(double min, double max) {
