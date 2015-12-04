@@ -18,7 +18,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	private double ballAngle = Math.PI;//Math.random()*2*Math.PI;
 	private int paddleLong = 100;
 	private int paddleShort = 15;
-	private double paddleRicochetRangeDegrees = 60;
+	private double paddleRicochetRangeDegrees = 180;
 	private double paddleRicochetRangeDegreesHalf = paddleRicochetRangeDegrees/2;
 	private static JFrame frame;
 
@@ -133,7 +133,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 					ballVelocity = 0;
 					ballX = (screenWidth-ballDiam) / 2;
 					ballY = (screenHeight-ballDiam) / 2;
-					ballAngle = Math.PI;//Math.random()*2*Math.PI;
+					ballAngle = Math.random()*2*Math.PI;
 				}
 		
 		ballX += velocityX;
