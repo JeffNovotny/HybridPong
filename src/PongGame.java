@@ -7,7 +7,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	private int screenWidth = 800;
 	private int screenHeight = 600;
 	private int ballDiam = 20;
-	private int ballX = (screenWidth-ballDiam) / 2;
+	private int ballX = (screenWidth - ballDiam) / 2;
 	private int ballY = (screenHeight - ballDiam) / 2;
 	private int paddleX = 0;
 	private int paddleY = 0;
