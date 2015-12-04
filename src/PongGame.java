@@ -2,7 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class PongGame extends JComponent implements ActionListener, MouseMotionListener, MouseListener {
+public class PongGame extends JComponent implements ActionListener, MouseMotionListener, MouseListener, ComponentListener {
 
 	private int screenWidth = 800;
 	private int screenHeight = 600;
@@ -16,11 +16,12 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	private double ballAngle = Math.random()*2*Math.PI;
 	private int paddleLong = 100;
 	private int paddleShort = 15;
+	private static JFrame frame;
 
 	private static int fps = 60;
 	
 	public static void main(String[] args){
-		JFrame frame = new JFrame("Pong");
+		frame = new JFrame("Pong");
 		PongGame game = new PongGame();
 		frame.add(game);
 		frame.pack();
@@ -30,6 +31,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		
 		//start game
 		frame.addMouseListener((MouseListener) game);
+		frame.addComponentListener((ComponentListener) game);
 		
 		//ball frame rate
 		Timer timer = new Timer(1000/fps, game);
@@ -136,7 +138,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	public void mouseClicked(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 		if(ballVelocity == 0){
-		ballVelocity = ballStartVelocity;
+			ballVelocity = ballStartVelocity;
 		}
 	}
 
@@ -160,6 +162,35 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void componentResized(ComponentEvent e) {
+		Dimension newSize = frame.getContentPane().getBounds().getSize();
+		screenWidth = newSize.width;
+		screenHeight = newSize.height;
+		if(ballVelocity == 0){
+			ballX = (screenWidth-ballDiam) / 2;
+			ballY = (screenHeight-ballDiam) / 2;
+		}
+    }
+
+	@Override
+	public void componentMoved(ComponentEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void componentShown(ComponentEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void componentHidden(ComponentEvent e) {
 		// TODO Auto-generated method stub
 		
 	}
