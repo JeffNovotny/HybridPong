@@ -1,7 +1,5 @@
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Random;
-
 import javax.swing.*;
 
 public class PongGame extends JComponent implements ActionListener, MouseMotionListener, MouseListener, ComponentListener {
@@ -15,10 +13,10 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	private int paddleY = 0;
 	private double ballStartVelocity = 600;
 	private double ballVelocity = 0;
-	private double ballAngle = Math.PI;//Math.random()*2*Math.PI;
+	private double ballAngle = Math.random()*2*Math.PI;
 	private int paddleLong = 100;
 	private int paddleShort = 15;
-	private double paddleRicochetRangeDegrees = 180;
+	private double paddleRicochetRangeDegrees = 60;
 	private double paddleRicochetRangeDegreesHalf = paddleRicochetRangeDegrees/2;
 	private static JFrame frame;
 
@@ -83,42 +81,26 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		// bottom paddle
 		if(velocityY > 0 && ballX >= paddleX && ballX <= paddleX + paddleLong && ballY + ballDiam >= screenHeight - paddleShort && ballY + ballDiam <= screenHeight){
 			ballY = screenHeight - paddleShort - ballDiam;
-			double relativeBallX = ballX+(ballDiam/2)-paddleX;
-			double percentage = relativeBallX/paddleLong;
-			double targetAngle = 270;
-			ballAngle = percentageDouble(Math.toRadians(targetAngle-paddleRicochetRangeDegreesHalf), Math.toRadians(targetAngle+paddleRicochetRangeDegreesHalf), percentage);
-			velocityX = (int)(ballVelocity/fps*Math.cos(ballAngle));
-			velocityY = (int)(ballVelocity/fps*Math.sin(ballAngle));
+			velocityY = -velocityY;
+			ballAngle = Math.atan2(velocityY, velocityX);
 		}
 		//top paddle
-		else if(velocityY < 0 && ballX >= paddleX && ballX <= paddleX + paddleLong && ballY <= 0 + paddleShort && ballY >= 0){
+		else if(velocityY < 0 && ballX >= paddleX && ballX <= paddleX + paddleLong && ballY <= 0 + paddleShort && ballY >= 0 ){
 			ballY = 0 + paddleShort;
-			double relativeBallX = ballX+(ballDiam/2)-paddleX;
-			double percentage = relativeBallX/paddleLong;
-			double targetAngle = 90;
-			ballAngle = percentageDouble(Math.toRadians(targetAngle+paddleRicochetRangeDegreesHalf), Math.toRadians(targetAngle-paddleRicochetRangeDegreesHalf), percentage);
-			velocityX = (int)(ballVelocity/fps*Math.cos(ballAngle));
-			velocityY = (int)(ballVelocity/fps*Math.sin(ballAngle));
+			velocityY = -velocityY;
+			ballAngle = Math.atan2(velocityY, velocityX);
 		}
 		// right paddle
 		if(velocityX > 0  && ballY >= paddleY && ballY <= paddleY + paddleLong && ballX + ballDiam >= screenWidth - paddleShort && ballX + ballDiam <= screenWidth){
 			ballX = screenWidth - paddleShort - ballDiam;
-			double relativeBallY = ballY+(ballDiam/2)-paddleY;
-			double percentage = relativeBallY/paddleLong;
-			double targetAngle = 180;
-			ballAngle = percentageDouble(Math.toRadians(targetAngle+paddleRicochetRangeDegreesHalf), Math.toRadians(targetAngle-paddleRicochetRangeDegreesHalf), percentage);
-			velocityX = (int)(ballVelocity/fps*Math.cos(ballAngle));
-			velocityY = (int)(ballVelocity/fps*Math.sin(ballAngle));
+			velocityX = -velocityX;
+			ballAngle = Math.atan2(velocityY, velocityX);
 		}
 		//left paddle
 		else if(velocityX < 0 && ballY >= paddleY && ballY <= paddleY + paddleLong && ballX <= 0 + paddleShort && ballX >= 0){
 			ballX = 0 + paddleShort;
-			double relativeBallY = ballY+(ballDiam/2)-paddleY;
-			double percentage = relativeBallY/paddleLong;
-			double targetAngle = 0;
-			ballAngle = percentageDouble(Math.toRadians(targetAngle-paddleRicochetRangeDegreesHalf), Math.toRadians(targetAngle+paddleRicochetRangeDegreesHalf), percentage);
-			velocityX = (int)(ballVelocity/fps*Math.cos(ballAngle));
-			velocityY = (int)(ballVelocity/fps*Math.sin(ballAngle));
+			velocityX = -velocityX;
+			ballAngle = Math.atan2(velocityY, velocityX);
 		}
 		//restart here
 		if (ballVelocity != 0 &&
@@ -141,16 +123,6 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		
 		repaint();
 	}
-	
-	private double randomDouble(double min, double max) {
-		Random r = new Random();
-		return min + (max - min) * r.nextDouble();
-	}
-	
-	private double percentageDouble(double min, double max, double percentage) {
-		return min + (max - min) * percentage;
-	}
-
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
