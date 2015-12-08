@@ -3,26 +3,45 @@ import java.awt.event.*;
 import java.util.Random;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 
 public class PongGame extends JComponent implements ActionListener, MouseMotionListener, MouseListener, ComponentListener {
 
 	private int screenWidth = 800;
 	private int screenHeight = 600;
+	
+	//change the size of the ball
 	private int ballDiam = 20;
+	
 	private int ballX = (screenWidth - ballDiam) / 2;
 	private int ballY = (screenHeight - ballDiam) / 2;
 	private int paddleX = 0;
 	private int paddleY = 0;
-	private double ballStartVelocity = 600;
+	//change ball speed
+	private double ballStartVelocity;
+	
+	private static JLabel selectDificulty = new JLabel("Please Select Dificulty:");
+	private static JRadioButton easy = new JRadioButton("Easy");
+	private static JRadioButton medium = new JRadioButton("Medium");
+	private static JRadioButton hard = new JRadioButton("Hard");
+	private static JButton startButton = new JButton("Start");
+	
 	private double ballVelocity = 0;
 	private double ballAngle = Math.random()*2*Math.PI;
+	//change paddle length/width
 	private int paddleLong = 100;
 	private int paddleShort = 15;
-	private double paddleRicochetRangeDegrees = 60;
+	
+	//change ricochet severity 
+	private double paddleRicochetRangeDegrees = 180;
+	
 	private double paddleRicochetRangeDegreesHalf = paddleRicochetRangeDegrees/2;
+	
+	private static int fps = 60;
+	
 	private static JFrame frame;
 
-	private static int fps = 60;
+
 	
 	public static void main(String[] args){
 		frame = new JFrame("Pong");
@@ -46,6 +65,91 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		
 	}
 	
+	PongGame(){
+	
+		
+		JPanel startMenu = new JPanel();
+		startMenu.setBorder(new LineBorder(Color.black, 2));
+		startMenu.setSize(200, 100);
+		startMenu.setLocation(200, 300);
+		startMenu.add(selectDificulty);
+		startMenu.add(easy);
+		startMenu.add(medium);
+		startMenu.add(hard);
+		startMenu.add(startButton);
+		add(startMenu, BorderLayout.CENTER);
+			
+		medium.setSelected(true);
+		
+		easy.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				setEasyDificulty();
+			}
+		});
+		
+		medium.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				setMediumDificulty();
+			}
+			
+		});
+		
+		hard.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				setHardDificulty();
+			}
+			
+		});
+		
+		startButton.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+	}
+
+	protected double setEasyDificulty() {
+		easy.setSelected(true);
+		medium.setSelected(false);
+		hard.setSelected(false);
+		ballVelocity = 300;
+		paddleLong = 125;
+		return ballVelocity;
+	}
+	
+	protected double setMediumDificulty() {
+		// TODO Auto-generated method stub
+		medium.setSelected(true);
+		easy.setSelected(false);
+		hard.setSelected(false);
+		ballVelocity = 500;
+		paddleLong = 100;
+		return ballVelocity;
+	}
+	
+	protected double setHardDificulty() {
+		// TODO Auto-generated method stub
+		hard.setSelected(true);
+		medium.setSelected(false);
+		easy.setSelected(false);
+		ballVelocity = 800;
+		paddleLong = 75;
+		return ballVelocity;
+	}
+
 	public Dimension getPreferredSize(){
 		return new Dimension(screenWidth,screenHeight);
 	}
@@ -70,7 +174,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		g.fillRect(paddleX, 0, paddleLong, paddleShort);
 		
 		//ball
-		g.setColor(new Color(219, 61, 219));
+		g.setColor(new Color(255, 0, 0));
 		g.fillOval(ballX, ballY, ballDiam, ballDiam);
 		
 	}
@@ -148,11 +252,6 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	
 	private void ballHit() {
 		//effects after the ball was hit by a paddle
-	}
-	
-	private double randomDouble(double min, double max) {
-		Random r = new Random();
-		return min + (max - min) * r.nextDouble();
 	}
 	
 	private double percentageDouble(double min, double max, double percentage) {
