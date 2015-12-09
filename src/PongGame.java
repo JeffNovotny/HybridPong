@@ -1,12 +1,12 @@
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Random;
-
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
 public class PongGame extends JComponent implements ActionListener, MouseMotionListener, MouseListener, ComponentListener {
-
+																						
+																			//ALL VARIABLES
+	private static final Boolean START_GAME_ON_SCREEN_CLICK = false;
 	private int screenWidth = 800;
 	private int screenHeight = 600;
 	
@@ -20,11 +20,22 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	//change ball speed
 	private double ballStartVelocity;
 	
-	private static JLabel selectDificulty = new JLabel("Please Select Dificulty:");
+	//Start menu Labels
+	private static JLabel selectDifficulty = new JLabel("Please Select Difficulty:");
+	private static JLabel selectBallSize = new JLabel("Select Ball Size: ");
+	
+	//Create difficulty radio buttons
 	private static JRadioButton easy = new JRadioButton("Easy");
 	private static JRadioButton medium = new JRadioButton("Medium");
 	private static JRadioButton hard = new JRadioButton("Hard");
+	
+	//Create start button
 	private static JButton startButton = new JButton("Start");
+	
+	//create ball size radio buttons
+	private static JRadioButton ballSizeSmall = new JRadioButton("Small");
+	private static JRadioButton ballSizeNormal = new JRadioButton("Normal");
+	private static JRadioButton ballSizeLarge = new JRadioButton("Large");
 	
 	private double ballVelocity = 0;
 	private double ballAngle = Math.random()*2*Math.PI;
@@ -41,9 +52,11 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	
 	private static JFrame frame;
 	private JPanel startMenu;
+	private ButtonGroup difficultyGroup;
+	private ButtonGroup sizeGroup;
 	
 	private static Boolean gamePlaying = false;
-
+																				//END VARIABLES
 
 	
 	public static void main(String[] args){
@@ -70,26 +83,56 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	
 	PongGame(){
 	
-		
-		startMenu = new JPanel();
+					//Game start menu
+		startMenu = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0) );
 		startMenu.setBorder(new LineBorder(Color.black, 2));
-		startMenu.setSize(200, 100);
-		startMenu.setLocation(200, 300);
-		startMenu.add(selectDificulty);
-		startMenu.add(easy);
-		startMenu.add(medium);
-		startMenu.add(hard);
-		startMenu.add(startButton);
-		add(startMenu, BorderLayout.CENTER);
-			
+		add(startMenu);
+		startMenu.setSize(400, 200);
+		startMenu.setLocation((screenWidth - 200) / 2, (screenHeight - 100) / 2);
+		
+					//adds the difficulty radio buttons to the menu
+		JPanel difficulty = new JPanel();
+		difficulty.add(selectDifficulty);
+		difficulty.setPreferredSize( new Dimension(150, 125));
+		difficultyGroup = new ButtonGroup();
+		difficultyGroup.add(easy);
+		difficultyGroup.add(medium);
+		difficultyGroup.add(hard);
+		difficulty.add(easy);
+		difficulty.add(medium);
+		difficulty.add(hard);
+		startMenu.add(difficulty, BorderLayout.WEST);
+					//default difficulty
 		medium.setSelected(true);
+		setMediumDifficulty();
+		
+					//Adds ball size radio buttons to the start menu
+		JPanel ballSize = new JPanel();
+		ballSize.add(selectBallSize);
+		ballSize.setPreferredSize( new Dimension(150, 125));
+		sizeGroup = new ButtonGroup();
+		sizeGroup.add(ballSizeSmall);
+		sizeGroup.add(ballSizeNormal);
+		sizeGroup.add(ballSizeLarge);
+		ballSize.add(ballSizeSmall);
+		ballSize.add(ballSizeNormal);
+		ballSize.add(ballSizeLarge);
+		startMenu.add(ballSize, BorderLayout.EAST);
+		
+		ballSizeNormal.setSelected(true);
+		
+		//Adds the start button to the menu
+		JPanel startButtonPanel = new JPanel();
+		startButtonPanel.setPreferredSize( new Dimension(150, 50));
+		startButtonPanel.add(startButton);
+		startMenu.add(startButtonPanel, BorderLayout.SOUTH);
 		
 		easy.addActionListener(new ActionListener(){
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				setEasyDificulty();
+				setEasyDifficulty();
 			}
 		});
 		
@@ -98,7 +141,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				setMediumDificulty();
+				setMediumDifficulty();
 			}
 			
 		});
@@ -108,7 +151,37 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				setHardDificulty();
+				setHardDifficulty();
+			}
+			
+		});
+		
+		ballSizeSmall.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				ballDiam = 10;
+			}
+			
+		});
+		
+		ballSizeNormal.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				ballDiam = 20;
+			}
+			
+		});
+		
+		ballSizeLarge.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				ballDiam = 30;
 			}
 			
 		});
@@ -119,44 +192,45 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				startMenu.setVisible(false);
+				if (!START_GAME_ON_SCREEN_CLICK)
+					gamePlaying = true;
 			}
 			
 		});
 	}
 
-	protected double setEasyDificulty() {
+	protected double setEasyDifficulty() {
 		easy.setSelected(true);
-		medium.setSelected(false);
-		hard.setSelected(false);
-		ballVelocity = 300;
+		ballVelocity = 500;
 		paddleLong = 125;
 		return ballVelocity;
 	}
-	
-	protected double setMediumDificulty() {
+	protected double setMediumDifficulty() {
 		// TODO Auto-generated method stub
 		medium.setSelected(true);
-		easy.setSelected(false);
-		hard.setSelected(false);
-		ballVelocity = 500;
+		ballVelocity = 700;
 		paddleLong = 100;
 		return ballVelocity;
 	}
-	
-	protected double setHardDificulty() {
+	protected double setHardDifficulty() {
 		// TODO Auto-generated method stub
 		hard.setSelected(true);
-		medium.setSelected(false);
-		easy.setSelected(false);
-		ballVelocity = 800;
+		ballVelocity = 900;
 		paddleLong = 75;
 		return ballVelocity;
+	}
+	
+	private void gameOver() {
+		gamePlaying = false;
+		startMenu.setVisible(true);
+		setMediumDifficulty();
 	}
 
 	public Dimension getPreferredSize(){
 		return new Dimension(screenWidth,screenHeight);
 	}
 	
+	//draws the paddles and the ball on screen
 	protected void paintComponent(Graphics g){
 		
 		//Background
@@ -261,11 +335,6 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		//effects after the ball was hit by a paddle
 	}
 	
-	private void gameOver() {
-		gamePlaying = false;
-		startMenu.setVisible(true);
-	}
-	
 	private double percentageDouble(double min, double max, double percentage) {
 		return min + (max - min) * percentage;
 	}
@@ -277,11 +346,9 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-		if (gamePlaying) {
 			paddleX = e.getX() - 50;
 			paddleY = e.getY() - 75;
 			repaint();
-		}
 	}
 
 	@Override
@@ -289,7 +356,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		// TODO Auto-generated method stub
 		if(gamePlaying && ballVelocity == 0){
 			ballVelocity = ballStartVelocity;
-		} else if (!startMenu.isVisible()) {
+		} else if (START_GAME_ON_SCREEN_CLICK && !startMenu.isVisible()) {
 			gamePlaying = true;
 			mouseMoved(arg0);
 		}
@@ -303,20 +370,14 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 
 	@Override
 	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void mousePressed(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	@Override
@@ -332,19 +393,13 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 
 	@Override
 	public void componentMoved(ComponentEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void componentShown(ComponentEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void componentHidden(ComponentEvent e) {
-		// TODO Auto-generated method stub
-		
 	}
 }
