@@ -5,7 +5,7 @@ import javax.swing.border.LineBorder;
 
 public class PongGame extends JComponent implements ActionListener, MouseMotionListener, MouseListener, ComponentListener {
 																						
-																			//ALL VARIABLES
+	//ALL VARIABLES
 	private static final Boolean START_GAME_ON_SCREEN_CLICK = false;
 	private int screenWidth = 800;
 	private int screenHeight = 600;
@@ -60,7 +60,15 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	private static JLabel scoreCounter;
 	
 	private static Boolean gamePlaying = false;
-																				//END VARIABLES
+	
+	private enum Difficulty {
+		Easy,
+		Medium,
+		Hard
+	}
+	private static Difficulty difficulty;
+	
+	//END VARIABLES
 
 	
 	public static void main(String[] args){
@@ -214,20 +222,21 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	}
 
 	protected double setEasyDifficulty() {
+		difficulty = Difficulty.Easy;
 		easy.setSelected(true);
 		ballVelocity = 500;
 		paddleLong = 125;
 		return scoreCount = 5;
 	}
 	protected double setMediumDifficulty() {
-		// TODO Auto-generated method stub
+		difficulty = Difficulty.Medium;
 		medium.setSelected(true);
 		ballVelocity = 700;
 		paddleLong = 100;
 		return scoreCount = 10;
 	}
 	protected double setHardDifficulty() {
-		// TODO Auto-generated method stub
+		difficulty = Difficulty.Hard;
 		hard.setSelected(true);
 		ballVelocity = 900;
 		paddleLong = 75;
@@ -236,8 +245,18 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	
 	private void gameOver() {
 		gamePlaying = false;
+		switch (difficulty) {
+			case Easy:
+				setEasyDifficulty();
+				break;
+			case Medium:
+				setMediumDifficulty();
+				break;
+			case Hard:
+				setHardDifficulty();
+				break;
+		}
 		startMenu.setVisible(true);
-		
 		scoreCounter.setText("You Scored: " + score);
 	}
 
