@@ -50,10 +50,14 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	
 	private static int fps = 60;
 	
+	private static int score;
+	private static int scoreCount = 10;
+	
 	private static JFrame frame;
 	private JPanel startMenu;
 	private ButtonGroup difficultyGroup;
 	private ButtonGroup sizeGroup;
+	private static JLabel scoreCounter;
 	
 	private static Boolean gamePlaying = false;
 																				//END VARIABLES
@@ -78,6 +82,10 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		
 		// paddles
 		frame.addMouseMotionListener(game);
+		
+		scoreCounter = new JLabel("Your Score is: " + score);
+		scoreCounter.setVisible(false);
+		frame.add(scoreCounter, BorderLayout.CENTER);
 		
 	}
 	
@@ -114,9 +122,9 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		sizeGroup.add(ballSizeSmall);
 		sizeGroup.add(ballSizeNormal);
 		sizeGroup.add(ballSizeLarge);
-		ballSize.add(ballSizeSmall);
-		ballSize.add(ballSizeNormal);
 		ballSize.add(ballSizeLarge);
+		ballSize.add(ballSizeNormal);
+		ballSize.add(ballSizeSmall);
 		startMenu.add(ballSize, BorderLayout.EAST);
 		
 		ballSizeNormal.setSelected(true);
@@ -162,6 +170,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
 				ballDiam = 10;
+				scoreCount += 15;
 			}
 			
 		});
@@ -172,6 +181,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				ballDiam = 20;
+				scoreCount += 10;
 			}
 			
 		});
@@ -182,6 +192,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				ballDiam = 30;
+				scoreCount += 5;
 			}
 			
 		});
@@ -194,6 +205,9 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 				startMenu.setVisible(false);
 				if (!START_GAME_ON_SCREEN_CLICK)
 					gamePlaying = true;
+				score = 0;
+					scoreCounter.setVisible(true);
+					scoreCounter.setText("Your Score is " + score);
 			}
 			
 		});
@@ -203,27 +217,28 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		easy.setSelected(true);
 		ballVelocity = 500;
 		paddleLong = 125;
-		return ballVelocity;
+		return scoreCount = 5;
 	}
 	protected double setMediumDifficulty() {
 		// TODO Auto-generated method stub
 		medium.setSelected(true);
 		ballVelocity = 700;
 		paddleLong = 100;
-		return ballVelocity;
+		return scoreCount = 10;
 	}
 	protected double setHardDifficulty() {
 		// TODO Auto-generated method stub
 		hard.setSelected(true);
 		ballVelocity = 900;
 		paddleLong = 75;
-		return ballVelocity;
+		return scoreCount = 15;
 	}
 	
 	private void gameOver() {
 		gamePlaying = false;
 		startMenu.setVisible(true);
-		setMediumDifficulty();
+		
+		scoreCounter.setText("You Scored: " + score);
 	}
 
 	public Dimension getPreferredSize(){
@@ -326,13 +341,14 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 			
 			ballX += velocityX;
 			ballY += velocityY;
-			
 			repaint();
 		}
 	}
 	
 	private void ballHit() {
 		//effects after the ball was hit by a paddle
+		score = score + scoreCount;
+		scoreCounter.setText("Your Score is: " + score);
 	}
 	
 	private double percentageDouble(double min, double max, double percentage) {
@@ -356,6 +372,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		// TODO Auto-generated method stub
 		if(gamePlaying && ballVelocity == 0){
 			ballVelocity = ballStartVelocity;
+			scoreCounter.setVisible(true);
 		} else if (START_GAME_ON_SCREEN_CLICK && !startMenu.isVisible()) {
 			gamePlaying = true;
 			mouseMoved(arg0);
