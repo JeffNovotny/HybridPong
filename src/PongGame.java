@@ -7,8 +7,10 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 																						
 	//ALL VARIABLES
 	private static final Boolean START_GAME_ON_SCREEN_CLICK = false;
-	private int screenWidth = 800;
-	private int screenHeight = 600;
+	private static int screenWidth = 800;
+	private static int screenHeight = 600;
+	private int gameMenuWidth = 400;
+	private int gameMenuHeight = 200;
 	
 	//change the size of the ball
 	private int ballDiam = 20;
@@ -99,10 +101,15 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		// paddles
 		frame.addMouseMotionListener(game);
 		
+		// creates the score counter
 		scoreCounter = new JLabel("Your Score is: " + score);
 		scoreCounter.setVisible(false);
 		frame.add(scoreCounter, BorderLayout.CENTER);
 		
+	}
+	
+	public Dimension getPreferredSize(){
+		return new Dimension(screenWidth,screenHeight);
 	}
 	
 	PongGame(){
@@ -111,8 +118,8 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		startMenu = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0) );
 		startMenu.setBorder(new LineBorder(Color.black, 2));
 		add(startMenu, BorderLayout.CENTER);
-		startMenu.setSize(400, 200);
-		startMenu.setLocation((screenWidth - 400) / 2, (screenHeight - 200) / 2);
+		startMenu.setSize(gameMenuWidth, gameMenuHeight);
+		startMenu.setLocation((screenWidth - gameMenuWidth) / 2, (screenHeight - gameMenuHeight) / 2);
 		
 					//adds the difficulty radio buttons to the menu
 		JPanel difficulty = new JPanel();
@@ -151,6 +158,10 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		startButtonPanel.add(startButton);
 		startMenu.add(startButtonPanel, BorderLayout.CENTER);
 		
+//		scoreCounter = new JLabel("Your Score is: " + score);
+//		scoreCounter.setVisible(false);
+//		add(scoreCounter, BorderLayout.SOUTH);
+		
 		easy.addActionListener(new ActionListener(){
 
 			@Override
@@ -186,6 +197,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
 				setSmallBall();
+				scoreCount += 15;
 			}
 			
 		});
@@ -250,38 +262,40 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	
 	protected double setLargeBall(){
 		ballSize = changeBallSize.large;
-		ballSizeLarge.setSelected(true);
+		ballSizeLarge.isSelected();
 		ballDiam = 30;
 		return scoreCount += 5;
 	}
 	protected double setNormalBall(){
 		ballSize = changeBallSize.normal;
-		ballSizeNormal.setSelected(true);
+		ballSizeNormal.isSelected();
 		ballDiam = 20;
 		return scoreCount += 10;
 	}	
 	protected double setSmallBall(){
 		ballSize = changeBallSize.small;
-		ballSizeSmall.setSelected(true);
+		ballSizeSmall.isSelected();
 		ballDiam = 10;
-		return scoreCount += 15;
+		return ballDiam;
 	}
 	
 	private void gameOver() {
 		gamePlaying = false;
+		
+//		switch (ballSize) {
+//		case large:
+//			setLargeBall();
+//			break;
+//		case normal:
+//			setNormalBall();
+//			break;
+//		case small:
+//			setSmallBall();
+//			break;
+//	}
+		
 		switch (difficulty) {
 			case Easy:
-				switch (ballSize) {
-				case large:
-					setLargeBall();
-					break;
-				case normal:
-					setNormalBall();
-					break;
-				case small:
-					setSmallBall();
-					break;
-			}
 				setEasyDifficulty();
 				break;
 			case Medium:
@@ -292,14 +306,10 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 				break;
 		}
 		
-
 		startMenu.setVisible(true);
 		scoreCounter.setText("You Scored: " + score);
 	}
 
-	public Dimension getPreferredSize(){
-		return new Dimension(screenWidth,screenHeight);
-	}
 	
 	//draws the paddles and the ball on screen
 	protected void paintComponent(Graphics g){
