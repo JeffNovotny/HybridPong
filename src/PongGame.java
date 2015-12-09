@@ -51,7 +51,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	private static int fps = 60;
 	
 	private static int score;
-	private static int scoreCount = 10;
+	private static int scoreCount;
 	
 	private static JFrame frame;
 	private JPanel startMenu;
@@ -67,6 +67,14 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		Hard
 	}
 	private static Difficulty difficulty;
+	
+	private enum changeBallSize {
+		large,
+		normal,
+		small
+	}
+	
+	private static changeBallSize ballSize;
 	
 	//END VARIABLES
 
@@ -177,8 +185,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				ballDiam = 10;
-				scoreCount += 15;
+				setSmallBall();
 			}
 			
 		});
@@ -188,8 +195,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				ballDiam = 20;
-				scoreCount += 10;
+				setNormalBall();
 			}
 			
 		});
@@ -199,8 +205,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				ballDiam = 30;
-				scoreCount += 5;
+				setLargeBall();
 			}
 			
 		});
@@ -243,10 +248,40 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		return scoreCount = 15;
 	}
 	
+	protected double setLargeBall(){
+		ballSize = changeBallSize.large;
+		ballSizeLarge.setSelected(true);
+		ballDiam = 30;
+		return scoreCount += 5;
+	}
+	protected double setNormalBall(){
+		ballSize = changeBallSize.normal;
+		ballSizeNormal.setSelected(true);
+		ballDiam = 20;
+		return scoreCount += 10;
+	}	
+	protected double setSmallBall(){
+		ballSize = changeBallSize.small;
+		ballSizeSmall.setSelected(true);
+		ballDiam = 10;
+		return scoreCount += 15;
+	}
+	
 	private void gameOver() {
 		gamePlaying = false;
 		switch (difficulty) {
 			case Easy:
+				switch (ballSize) {
+				case large:
+					setLargeBall();
+					break;
+				case normal:
+					setNormalBall();
+					break;
+				case small:
+					setSmallBall();
+					break;
+			}
 				setEasyDifficulty();
 				break;
 			case Medium:
@@ -256,6 +291,8 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 				setHardDifficulty();
 				break;
 		}
+		
+
 		startMenu.setVisible(true);
 		scoreCounter.setText("You Scored: " + score);
 	}
