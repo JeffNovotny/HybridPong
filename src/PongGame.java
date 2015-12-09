@@ -86,9 +86,9 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 					//Game start menu
 		startMenu = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0) );
 		startMenu.setBorder(new LineBorder(Color.black, 2));
-		add(startMenu);
+		add(startMenu, BorderLayout.CENTER);
 		startMenu.setSize(400, 200);
-		startMenu.setLocation((screenWidth - 200) / 2, (screenHeight - 100) / 2);
+		startMenu.setLocation((screenWidth - 400) / 2, (screenHeight - 200) / 2);
 		
 					//adds the difficulty radio buttons to the menu
 		JPanel difficulty = new JPanel();
@@ -123,9 +123,9 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		
 		//Adds the start button to the menu
 		JPanel startButtonPanel = new JPanel();
-		startButtonPanel.setPreferredSize( new Dimension(150, 50));
+		startButtonPanel.setPreferredSize( new Dimension(125, 50));
 		startButtonPanel.add(startButton);
-		startMenu.add(startButtonPanel, BorderLayout.SOUTH);
+		startMenu.add(startButtonPanel, BorderLayout.CENTER);
 		
 		easy.addActionListener(new ActionListener(){
 
