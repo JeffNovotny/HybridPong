@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
+import javax.swing.event.AncestorListener;
 
 public class PongGame extends JComponent implements ActionListener, MouseMotionListener, MouseListener, ComponentListener {
 /*main() 		       		 89
@@ -317,6 +318,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		
 		startMenu.setVisible(true);
 		scoreCounter.setText("You Scored: " + score);
+		
 	}
 
 	
@@ -412,6 +414,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 				ballAngle = Math.random()*2*Math.PI;
 				
 				gameOver();
+				
 			}
 			
 			ballX += velocityX;
