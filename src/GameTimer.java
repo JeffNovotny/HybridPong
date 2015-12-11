@@ -16,8 +16,8 @@ public class GameTimer extends JPanel{
 		
 		public void run() {
 			secondsPassed++;
-//			lblSeconds = new JLabel("" + secondsPassed);			
-//			add(lblSeconds, BorderLayout.CENTER);
+			lblSeconds = new JLabel("" + secondsPassed);			
+			add(lblSeconds, BorderLayout.CENTER);
 		}
 	};
 	
