@@ -4,7 +4,12 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 
 public class PongGame extends JComponent implements ActionListener, MouseMotionListener, MouseListener, ComponentListener {
-																						
+/*main() 		       		 89
+ * game menu 	 			 119
+ * radio buttons listeners   172
+ * paint balls/paddles 		 322
+ * game logic				 349
+ */
 	//ALL VARIABLES
 	private static final Boolean START_GAME_ON_SCREEN_CLICK = false;
 	private static int screenWidth = 800;
@@ -55,6 +60,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	private static int score;
 	private static int scoreCount;
 	
+	//Game start menu components
 	private static JFrame frame;
 	private JPanel startMenu;
 	private ButtonGroup difficultyGroup;
@@ -63,6 +69,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	
 	private static Boolean gamePlaying = false;
 	
+	//This is for the radio buttons
 	private enum Difficulty {
 		Easy,
 		Medium,
@@ -78,10 +85,14 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	
 	private static changeBallSize ballSize;
 	
-	//END VARIABLES
-
+	//Gameplay timer
+	public JPanel timerPanel;
+	public JLabel timeCounter;
+	public int secondsPassed = 0;
+	public Timer gameTimer;
 	
 	public static void main(String[] args){
+		
 		frame = new JFrame("Pong");
 		PongGame game = new PongGame();
 		frame.add(game);
@@ -99,13 +110,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		timer.start();
 		
 		// paddles
-		frame.addMouseMotionListener(game);
-		
-		// creates the score counter
-		scoreCounter = new JLabel("Your Score is: " + score);
-		scoreCounter.setVisible(false);
-		frame.add(scoreCounter, BorderLayout.CENTER);
-		
+		frame.addMouseMotionListener(game);	
 	}
 	
 	public Dimension getPreferredSize(){
@@ -113,7 +118,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	}
 	
 	PongGame(){
-	
+		GameTimer gameTimer = new GameTimer();
 					//Game start menu
 		startMenu = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0) );
 		startMenu.setBorder(new LineBorder(Color.black, 2));
@@ -158,9 +163,13 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		startButtonPanel.add(startButton);
 		startMenu.add(startButtonPanel, BorderLayout.CENTER);
 		
-//		scoreCounter = new JLabel("Your Score is: " + score);
-//		scoreCounter.setVisible(false);
-//		add(scoreCounter, BorderLayout.SOUTH);
+		// timer and score tracker
+		timerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+		scoreCounter = new JLabel("Your Score is: " + score);
+		timerPanel.setBorder(new LineBorder(Color.black, 2));
+		add(timerPanel, BorderLayout.CENTER);
+		timerPanel.setBounds((screenWidth - 200) / 2, 425, 200, 50);
+		timerPanel.add(scoreCounter);
 		
 		easy.addActionListener(new ActionListener(){
 
@@ -233,8 +242,8 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 				score = 0;
 					scoreCounter.setVisible(true);
 					scoreCounter.setText("Your Score is " + score);
-			}
-			
+					timerPanel.add(gameTimer);
+			}	
 		});
 	}
 
