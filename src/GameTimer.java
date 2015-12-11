@@ -11,19 +11,30 @@ public class GameTimer extends JPanel{
 	JLabel lblSeconds;
 	
 	int secondsPassed = 0;
-	Timer timePassed = new Timer();
-	TimerTask task = new TimerTask() {
-		
-		public void run() {
-			secondsPassed++;
-			lblSeconds = new JLabel("" + secondsPassed);			
-			add(lblSeconds, BorderLayout.CENTER);
-		}
-	};
+	Timer timePassed;
+	TimerTask task;
 	
 	public GameTimer() {
-		timePassed.scheduleAtFixedRate(task, 1000, 1000);
-		
+		timePassed = new Timer();
+		task = new TimerTask() {
+			public void run() {
+				secondsPassed++;
+				lblSeconds = new JLabel("" + secondsPassed);			
+				add(lblSeconds, BorderLayout.CENTER);
+			}
+		};
+	}
+	
+	public void scheduleAtFixedRate() {
+		scheduleAtFixedRate(1000, 1000);
+	}
+	
+	public void scheduleAtFixedRate(long delay, long period) {
+		timePassed.scheduleAtFixedRate(task, delay, period);
+	}
+	
+	public void cancel() {
+		timePassed.cancel();
 	}
 
 }

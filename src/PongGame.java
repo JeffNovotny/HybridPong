@@ -70,6 +70,8 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	
 	private static Boolean gamePlaying = false;
 	
+	GameTimer gameTimer;
+	
 	//This is for the radio buttons
 	private enum Difficulty {
 		Easy,
@@ -90,7 +92,6 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	public JPanel timerPanel;
 	public JLabel timeCounter;
 	public int secondsPassed = 0;
-	public Timer gameTimer;
 	
 	public static void main(String[] args){
 		
@@ -119,7 +120,8 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	}
 	
 	PongGame(){
-		GameTimer gameTimer = new GameTimer();
+		gameTimer = new GameTimer();
+		
 					//Game start menu
 		startMenu = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0) );
 		startMenu.setBorder(new LineBorder(Color.black, 2));
@@ -244,6 +246,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 					scoreCounter.setVisible(true);
 					scoreCounter.setText("Your Score is " + score);
 					timerPanel.add(gameTimer);
+					gameTimer.scheduleAtFixedRate();
 			}	
 		});
 	}
@@ -292,6 +295,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	private void gameOver() {
 		gamePlaying = false;
 		
+		gameTimer.cancel();
 //		switch (ballSize) {
 //		case large:
 //			setLargeBall();
