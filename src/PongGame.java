@@ -12,7 +12,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
  */
 	//ALL VARIABLES
 	private static final Boolean START_GAME_ON_SCREEN_CLICK = false;
-	private static final int MAX_NUM_OF_BALLS = 3;
+	private static final int MAX_NUM_OF_BALLS = 2;
 	
 	private static int screenWidth = 800;
 	private static int screenHeight = 600;
@@ -233,9 +233,9 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				if (numOfBalls == 0) {
-					createBall();
-				}
+//				if (numOfBalls == 0) {
+//					createBall();
+//				}
 				startMenu.setVisible(false);
 				if (!START_GAME_ON_SCREEN_CLICK)
 					gameTimer = new GameTimer();
@@ -245,23 +245,16 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 					scoreCounter.setText("Your Score is " + score);
 					timerPanel.add(gameTimer);
 //					gameTimer.task.run();
+					
+					createBall();
 			}	
 		});
+		
+
 	}
 	
-	void createBall() {
-		if (numOfBalls >= MAX_NUM_OF_BALLS) return;
+	void destroyBall(){
 		
-		Ball ball = new Ball();
-		ball.diameter = ballDefault.diameter;
-		ball.x = (screenWidth - ball.diameter) / 2;
-		ball.y = (screenHeight - ball.diameter) / 2;
-		ball.angle = Math.random()*2*Math.PI;
-		ball.velocity = ballDefault.velocity;
-		
-		balls[numOfBalls] = ball;
-		
-		numOfBalls++;
 	}
 
 	protected double setEasyDifficulty() {
@@ -333,9 +326,26 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 				break;
 		}
 		
+		destroyBall();
+		
 		startMenu.setVisible(true);
 		scoreCounter.setText("You Scored: " + score);
 		
+	}
+	
+	void createBall() {
+		if (numOfBalls >= MAX_NUM_OF_BALLS) return;
+		
+		Ball ball = new Ball();
+		ball.diameter = ballDefault.diameter;
+		ball.x = (screenWidth - ball.diameter) / 2;
+		ball.y = (screenHeight - ball.diameter) / 2;
+		ball.angle = Math.random()*2*Math.PI;
+		ball.velocity = ballDefault.velocity;
+		
+		balls[numOfBalls] = ball;
+		
+		numOfBalls++;
 	}
 
 	
@@ -364,13 +374,10 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		for (Ball ball : balls) {
 			if (ball == null) continue;
 			g.fillOval(ball.x, ball.y, ball.diameter, ball.diameter);
+			if(gameTimer.secondsPassed == 0){
+				createBall();
 		}
-		
-		// ball 2
-		if(gameTimer.secondsPassed == 0) {
-			createBall();
-		}
-		
+		}	
 	}
 
 	@Override
@@ -443,6 +450,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 					ball.y = (screenHeight-ball.diameter) / 2;
 					ball.angle = Math.random()*2*Math.PI;
 				
+					destroyBall();
 					gameOver();
 					break;
 				}
