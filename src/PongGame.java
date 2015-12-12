@@ -12,24 +12,16 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
  */
 	//ALL VARIABLES
 	private static final Boolean START_GAME_ON_SCREEN_CLICK = false;
+	private static final int MAX_NUM_OF_BALLS = 3;
+	
 	private static int screenWidth = 800;
 	private static int screenHeight = 600;
 	private int gameMenuWidth = 400;
 	private int gameMenuHeight = 200;
 	
-	//change the size of the ball
-	private int ballDiam = 20;
-	private int ballDiam2 = 20;
-	
-	private int ballX = (screenWidth - ballDiam) / 2;
-	private int ballY = (screenHeight - ballDiam) / 2;
-	private int ballX2 = 400;//(screenWidth - ballDiam2) / 2;
-	private int ballY2 = 300;//(screenHeight - ballDiam2) / 2;
-	
 	private int paddleX = 0;
 	private int paddleY = 0;
 	//change ball speed
-	private double ballStartVelocity;
 	
 	//Start menu Labels
 	private static JLabel selectDifficulty = new JLabel("Please Select Difficulty:");
@@ -48,9 +40,6 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	private static JRadioButton ballSizeNormal = new JRadioButton("Normal");
 	private static JRadioButton ballSizeLarge = new JRadioButton("Large");
 	
-	private double ballVelocity = 0;
-	private double ballAngle = Math.random()*2*Math.PI;
-	private double ballAngle2 = Math.PI;//Math.random()*2*Math.PI;
 	//change paddle length/width
 	private int paddleLong = 100;
 	private int paddleShort = 15;
@@ -75,6 +64,9 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	private static Boolean gamePlaying = false;
 	
 	GameTimer gameTimer;
+	Ball ballDefault = new Ball();
+	private Ball[] balls = new Ball[MAX_NUM_OF_BALLS];
+	int numOfBalls = 0;
 	
 	//This is for the radio buttons
 	private enum Difficulty {
@@ -145,7 +137,6 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		difficulty.add(hard);
 		startMenu.add(difficulty, BorderLayout.WEST);
 					//default difficulty
-		medium.setSelected(true);
 		setMediumDifficulty();
 		
 					//Adds ball size radio buttons to the start menu
@@ -161,7 +152,7 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		ballSize.add(ballSizeSmall);
 		startMenu.add(ballSize, BorderLayout.EAST);
 		
-		ballSizeNormal.setSelected(true);
+		setNormalBall();
 		
 		//Adds the start button to the menu
 		JPanel startButtonPanel = new JPanel();
@@ -242,6 +233,9 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
+				if (numOfBalls == 0) {
+					createBall();
+				}
 				startMenu.setVisible(false);
 				if (!START_GAME_ON_SCREEN_CLICK)
 					gameTimer = new GameTimer();
@@ -254,46 +248,61 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 			}	
 		});
 	}
+	
+	void createBall() {
+		if (numOfBalls >= MAX_NUM_OF_BALLS) return;
+		
+		Ball ball = new Ball();
+		ball.diameter = ballDefault.diameter;
+		ball.x = (screenWidth - ball.diameter) / 2;
+		ball.y = (screenHeight - ball.diameter) / 2;
+		ball.angle = Math.random()*2*Math.PI;
+		ball.velocity = ballDefault.velocity;
+		
+		balls[numOfBalls] = ball;
+		
+		numOfBalls++;
+	}
 
 	protected double setEasyDifficulty() {
 		difficulty = Difficulty.Easy;
 		easy.setSelected(true);
-		ballVelocity = 500;
+		ballDefault.velocity = 500;
 		paddleLong = 125;
 		return scoreCount = 5;
 	}
 	protected double setMediumDifficulty() {
 		difficulty = Difficulty.Medium;
 		medium.setSelected(true);
-		ballVelocity = 700;
+		ballDefault.velocity = 700;
 		paddleLong = 100;
 		return scoreCount = 10;
 	}
 	protected double setHardDifficulty() {
 		difficulty = Difficulty.Hard;
 		hard.setSelected(true);
-		ballVelocity = 900;
+		ballDefault.velocity = 900;
 		paddleLong = 75;
 		return scoreCount = 15;
 	}
 	
 	protected double setLargeBall(){
 		ballSize = changeBallSize.large;
-		ballSizeLarge.isSelected();
-		ballDiam = 30;
+		ballSizeLarge.setSelected(true);
+		ballDefault.diameter = 30;
 		return scoreCount += 5;
 	}
 	protected double setNormalBall(){
 		ballSize = changeBallSize.normal;
-		ballSizeNormal.isSelected();
-		ballDiam = 20;
+		ballSizeNormal.setSelected(true);
+		ballDefault.diameter = 20;
 		return scoreCount += 10;
 	}	
 	protected double setSmallBall(){
 		ballSize = changeBallSize.small;
-		ballSizeSmall.isSelected();
-		ballDiam = 10;
-		return ballDiam;
+		ballSizeSmall.setSelected(true);
+		ballDefault.diameter = 10;
+		return ballDefault.diameter;
 	}
 	
 	private void gameOver() {
@@ -352,12 +361,14 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		
 		//ball 1
 		g.setColor(new Color(255, 0, 0));
-		g.fillOval(ballX, ballY, ballDiam, ballDiam);
+		for (Ball ball : balls) {
+			if (ball == null) continue;
+			g.fillOval(ball.x, ball.y, ball.diameter, ball.diameter);
+		}
 		
 		// ball 2
 		if(gameTimer.secondsPassed == 0) {
-			g.setColor(Color.BLUE);
-			g.fillOval(ballX2, ballY2, ballDiam2, ballDiam2);
+			createBall();
 		}
 		
 	}
@@ -365,132 +376,80 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (gamePlaying) {
-			int velocityX = (int)(ballVelocity/fps*Math.cos(ballAngle));
-			int velocityY = (int)(ballVelocity/fps*Math.sin(ballAngle));
-			
-			// bottom paddle
-			if(velocityY > 0 && ballX >= paddleX && ballX <= paddleX + paddleLong && ballY + ballDiam >= screenHeight - paddleShort && ballY + ballDiam <= screenHeight){
-				ballY = screenHeight - paddleShort - ballDiam;
-				ballY2 = screenHeight - paddleShort - ballDiam2;
-				double relativeBallX = ballX+(ballDiam/2)-paddleX;
-				double percentage = relativeBallX/paddleLong;
-				double targetAngle = 270;
-				ballAngle = percentageDouble(Math.toRadians(targetAngle-paddleRicochetRangeDegreesHalf), Math.toRadians(targetAngle+paddleRicochetRangeDegreesHalf), percentage);
-				velocityX = (int)(ballVelocity/fps*Math.cos(ballAngle));
-				velocityY = (int)(ballVelocity/fps*Math.sin(ballAngle));
-				ballHit();
-			}
-			//top paddle
-			else if(velocityY < 0 && ballX >= paddleX && ballX <= paddleX + paddleLong && ballY <= 0 + paddleShort && ballY >= 0){
-				ballY = 0 + paddleShort;
-				ballY2 = 0 + paddleShort;
-				double relativeBallX = ballX+(ballDiam/2)-paddleX;
-				double percentage = relativeBallX/paddleLong;
-				double targetAngle = 90;
-				ballAngle = percentageDouble(Math.toRadians(targetAngle+paddleRicochetRangeDegreesHalf), Math.toRadians(targetAngle-paddleRicochetRangeDegreesHalf), percentage);
-				velocityX = (int)(ballVelocity/fps*Math.cos(ballAngle));
-				velocityY = (int)(ballVelocity/fps*Math.sin(ballAngle));
-				ballHit();
-			}
-
-			// right paddle
-			if(velocityX > 0  && ballY >= paddleY && ballY <= paddleY + paddleLong && ballX + ballDiam >= screenWidth - paddleShort && ballX + ballDiam <= screenWidth){
-				ballX = screenWidth - paddleShort - ballDiam;
-				ballX2 = screenWidth - paddleShort - ballDiam;
-				double relativeBallY = ballY+(ballDiam/2)-paddleY;
-				double percentage = relativeBallY/paddleLong;
-				double targetAngle = 180;
-				ballAngle = percentageDouble(Math.toRadians(targetAngle+paddleRicochetRangeDegreesHalf), Math.toRadians(targetAngle-paddleRicochetRangeDegreesHalf), percentage);
-				velocityX = (int)(ballVelocity/fps*Math.cos(ballAngle));
-				velocityY = (int)(ballVelocity/fps*Math.sin(ballAngle));
-				ballHit();
-			}
-			//left paddle
-			else if(velocityX < 0 && ballY >= paddleY && ballY <= paddleY + paddleLong && ballX <= 0 + paddleShort && ballX >= 0){
-				ballX = 0 + paddleShort;
-				ballX2 = 0 + paddleShort;
-				double relativeBallY = ballY+(ballDiam/2)-paddleY;
-				double percentage = relativeBallY/paddleLong;
-				double targetAngle = 0;
-				ballAngle = percentageDouble(Math.toRadians(targetAngle-paddleRicochetRangeDegreesHalf), Math.toRadians(targetAngle+paddleRicochetRangeDegreesHalf), percentage);
-				velocityX = (int)(ballVelocity/fps*Math.cos(ballAngle));
-				velocityY = (int)(ballVelocity/fps*Math.sin(ballAngle));
-				ballHit();
-			}
-			
-//			// ball 2 bottom paddle
-//			if(velocityY > 0 && ballX2 >= paddleX && ballX2 <= paddleX + paddleLong && ballY2 + ballDiam2 >= screenHeight - paddleShort && ballY2 + ballDiam2 <= screenHeight){
-//				ballY2 = screenHeight - paddleShort - ballDiam2;
-//				double relativeBallX = ballX2 +(ballDiam2 / 2)-paddleX;
-//				double percentage = relativeBallX/paddleLong;
-//				double targetAngle = 270;
-//				ballAngle2 = percentageDouble(Math.toRadians(targetAngle-paddleRicochetRangeDegreesHalf), Math.toRadians(targetAngle+paddleRicochetRangeDegreesHalf), percentage);
-//				velocityX = (int)(ballVelocity/fps*Math.cos(ballAngle2));
-//				velocityY = (int)(ballVelocity/fps*Math.sin(ballAngle2));
-//				ballHit();
-//			}
-//			// ball 2 top paddle
-//			else if(velocityY < 0 && ballX2 >= paddleX && ballX2 <= paddleX + paddleLong && ballY2 <= 0 + paddleShort && ballY2 >= 0){
-//				ballY2 = 0 + paddleShort;
-//				double relativeBallX = ballX2 +(ballDiam2/2)-paddleX;
-//				double percentage = relativeBallX/paddleLong;
-//				double targetAngle = 90;
-//				ballAngle2 = percentageDouble(Math.toRadians(targetAngle+paddleRicochetRangeDegreesHalf), Math.toRadians(targetAngle-paddleRicochetRangeDegreesHalf), percentage);
-//				velocityX = (int)(ballVelocity/fps*Math.cos(ballAngle2));
-//				velocityY = (int)(ballVelocity/fps*Math.sin(ballAngle2));
-//				ballHit();
-//			}
-//			// ball 2 right paddle
-//			if(velocityX > 0  && ballY2 >= paddleY && ballY2 <= paddleY + paddleLong && ballX2 + ballDiam2 >= screenWidth - paddleShort && ballX2 + ballDiam2 <= screenWidth){
-//				ballX2 = screenWidth - paddleShort - ballDiam2;
-//				double relativeBallY = ballY2 +(ballDiam2/2)-paddleY;
-//				double percentage = relativeBallY/paddleLong;
-//				double targetAngle = 180;
-//				ballAngle2 = percentageDouble(Math.toRadians(targetAngle+paddleRicochetRangeDegreesHalf), Math.toRadians(targetAngle-paddleRicochetRangeDegreesHalf), percentage);
-//				velocityX = (int)(ballVelocity/fps*Math.cos(ballAngle2));
-//				velocityY = (int)(ballVelocity/fps*Math.sin(ballAngle2));
-//				ballHit();
-//			}
-//			// ball 2 left paddle
-//			else if(velocityX < 0 && ballY2 >= paddleY && ballY2 <= paddleY + paddleLong && ballX2 <= 0 + paddleShort && ballX2 >= 0){
-//				ballX2 = 0 + paddleShort;
-//				double relativeBallY = ballY2 +(ballDiam2/2)-paddleY;
-//				double percentage = relativeBallY/paddleLong;
-//				double targetAngle = 0;
-//				ballAngle2 = percentageDouble(Math.toRadians(targetAngle-paddleRicochetRangeDegreesHalf), Math.toRadians(targetAngle+paddleRicochetRangeDegreesHalf), percentage);
-//				velocityX = (int)(ballVelocity/fps*Math.cos(ballAngle2));
-//				velocityY = (int)(ballVelocity/fps*Math.sin(ballAngle2));
-//				ballHit();
-//			}
-			//restart here
-			if (ballVelocity != 0 &&
-					   (ballX + ballDiam < 0 ||
-					    ballX > screenWidth ||
-					    ballY + ballDiam < 0 ||
-					    ballY > screenHeight  ||
-					    ballX2 + ballDiam < 0 ||
-					    ballX2 > screenWidth ||
-					    ballY2 + ballDiam < 0 ||
-					    ballY2 > screenHeight)) {
-				//this means the ball went passed the screen
-		
-				velocityX = 0;
-				velocityY = 0;
-				ballVelocity = 0;
-				ballX = (screenWidth-ballDiam) / 2;
-				ballY = (screenHeight-ballDiam) / 2;
-				ballX2 = (screenWidth-ballDiam) / 2;
-				ballY2 = (screenHeight-ballDiam) / 2;
-				ballAngle = Math.random()*2*Math.PI;
-			
-				gameOver();
+			for (Ball ball : balls) {
+				if (ball == null) continue;
 				
-			}
+				int velocityX = (int)(ball.velocity/fps*Math.cos(ball.angle));
+				int velocityY = (int)(ball.velocity/fps*Math.sin(ball.angle));
+				
+				// bottom paddle
+				if(velocityY > 0 && ball.x >= paddleX && ball.x <= paddleX + paddleLong && ball.y + ball.diameter >= screenHeight - paddleShort && ball.y + ball.diameter <= screenHeight){
+					ball.y = screenHeight - paddleShort - ball.diameter;
+					double relativeBallX = ball.x+(ball.diameter/2)-paddleX;
+					double percentage = relativeBallX/paddleLong;
+					double targetAngle = 270;
+					ball.angle = percentageDouble(Math.toRadians(targetAngle-paddleRicochetRangeDegreesHalf), Math.toRadians(targetAngle+paddleRicochetRangeDegreesHalf), percentage);
+					velocityX = (int)(ball.velocity/fps*Math.cos(ball.angle));
+					velocityY = (int)(ball.velocity/fps*Math.sin(ball.angle));
+					ballHit();
+				}
+				//top paddle
+				else if(velocityY < 0 && ball.x >= paddleX && ball.x <= paddleX + paddleLong && ball.y <= 0 + paddleShort && ball.y >= 0){
+					ball.y = 0 + paddleShort;
+					double relativeBallX = ball.x+(ball.diameter/2)-paddleX;
+					double percentage = relativeBallX/paddleLong;
+					double targetAngle = 90;
+					ball.angle = percentageDouble(Math.toRadians(targetAngle+paddleRicochetRangeDegreesHalf), Math.toRadians(targetAngle-paddleRicochetRangeDegreesHalf), percentage);
+					velocityX = (int)(ball.velocity/fps*Math.cos(ball.angle));
+					velocityY = (int)(ball.velocity/fps*Math.sin(ball.angle));
+					ballHit();
+				}
+	
+				// right paddle
+				if(velocityX > 0  && ball.y >= paddleY && ball.y <= paddleY + paddleLong && ball.x + ball.diameter >= screenWidth - paddleShort && ball.x + ball.diameter <= screenWidth){
+					ball.x = screenWidth - paddleShort - ball.diameter;
+					double relativeBallY = ball.y+(ball.diameter/2)-paddleY;
+					double percentage = relativeBallY/paddleLong;
+					double targetAngle = 180;
+					ball.angle = percentageDouble(Math.toRadians(targetAngle+paddleRicochetRangeDegreesHalf), Math.toRadians(targetAngle-paddleRicochetRangeDegreesHalf), percentage);
+					velocityX = (int)(ball.velocity/fps*Math.cos(ball.angle));
+					velocityY = (int)(ball.velocity/fps*Math.sin(ball.angle));
+					ballHit();
+				}
+				//left paddle
+				else if(velocityX < 0 && ball.y >= paddleY && ball.y <= paddleY + paddleLong && ball.x <= 0 + paddleShort && ball.x >= 0){
+					ball.x = 0 + paddleShort;
+					double relativeBallY = ball.y+(ball.diameter/2)-paddleY;
+					double percentage = relativeBallY/paddleLong;
+					double targetAngle = 0;
+					ball.angle = percentageDouble(Math.toRadians(targetAngle-paddleRicochetRangeDegreesHalf), Math.toRadians(targetAngle+paddleRicochetRangeDegreesHalf), percentage);
+					velocityX = (int)(ball.velocity/fps*Math.cos(ball.angle));
+					velocityY = (int)(ball.velocity/fps*Math.sin(ball.angle));
+					ballHit();
+				}
+				
+				//restart here
+				if (ball.velocity != 0 &&
+						   (ball.x + ball.diameter < 0 ||
+						    ball.x > screenWidth ||
+						    ball.y + ball.diameter < 0 ||
+						    ball.y > screenHeight)) {
+					//this means the ball went passed the screen
 			
-			ballX += velocityX;
-			ballY += velocityY;
-			ballX2 += velocityX;
-			ballY2 += velocityY;
+					velocityX = 0;
+					velocityY = 0;
+					ball.velocity = 0;
+					ball.x = (screenWidth-ball.diameter) / 2;
+					ball.y = (screenHeight-ball.diameter) / 2;
+					ball.angle = Math.random()*2*Math.PI;
+				
+					gameOver();
+					break;
+				}
+				
+				ball.x += velocityX;
+				ball.y += velocityY;
+			}
 			repaint();
 		}
 	}
@@ -520,8 +479,11 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
 		// TODO Auto-generated method stub
-		if(gamePlaying && ballVelocity == 0){
-			ballVelocity = ballStartVelocity;
+		if(gamePlaying && (balls[0] == null || balls[0].velocity == 0)){
+			for (Ball ball : balls) {
+				if (ball == null) continue;
+				ball.velocity = ballDefault.velocity;
+			}
 			scoreCounter.setVisible(true);
 		} else if (START_GAME_ON_SCREEN_CLICK && !startMenu.isVisible()) {
 			gamePlaying = true;
@@ -552,9 +514,12 @@ public class PongGame extends JComponent implements ActionListener, MouseMotionL
 		Dimension newSize = frame.getContentPane().getBounds().getSize();
 		screenWidth = newSize.width;
 		screenHeight = newSize.height;
-		if(ballVelocity == 0){
-			ballX = (screenWidth-ballDiam) / 2;
-			ballY = (screenHeight-ballDiam) / 2;
+		for (Ball ball : balls) {
+			if (ball == null) continue;
+			if(ball.velocity == 0){
+				ball.x = (screenWidth-ball.diameter) / 2;
+				ball.y = (screenHeight-ball.diameter) / 2;
+			}
 		}
     }
 
